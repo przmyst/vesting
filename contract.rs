@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 const CONTRACT_NAME: &str = "terra-cw20-lock";
 const CONTRACT_VERSION: &str = "0.1.0";
 
-const LOCK_PERIOD: u64 = 605227;
+const LOCK_PERIOD: u64 = 420;
 const TARGET_ADDRESS: &str = "terra164kf48vusvnmsku8v37uy9ynxpr5u333hvcz0wd6mfr8el56wx9sfzuhxq";
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -152,7 +152,7 @@ fn try_lock(
 
             store_lock_info(deps.storage, &lock_info, state.nonce)?;
 
-            let lock_id = format!("{}_{}_{}", sender.clone(), token_address, state.nonce);
+            let lock_id = format!("{}_{}", sender.clone(), state.nonce);
 
             store_lock_info(deps.storage, &lock_info, state.nonce)?;
 
@@ -193,10 +193,8 @@ fn execute_unlock(
     lock_info.is_unlocked = true;
     deps.storage.set(lock_id.as_bytes(), &to_binary(&lock_info)?);
 
-    // Calculate total amount to return (initial amount + interest)
     let total_amount = lock_info.amount + lock_info.expected_interest;
 
-    // Create a transfer message for the CW20 contract
     let cw20_transfer_msg = CosmosMsg::Wasm(WasmMsg::Execute {
         contract_addr: lock_info.token_address.clone(),
         msg: to_binary(&cw20::Cw20ExecuteMsg::Transfer {
@@ -221,7 +219,7 @@ fn get_lock_info(storage: &dyn Storage, lock_id: &str) -> StdResult<LockInfo> {
 }
 
 fn store_lock_info(storage: &mut dyn Storage, lock_info: &LockInfo, nonce: u64) -> StdResult<()> {
-    let lock_id = format!("{}_{}_{}", lock_info.owner, lock_info.token_address, nonce);
+    let lock_id = format!("{}_{}", lock_info.owner, nonce);
     storage.set(lock_id.as_bytes(), &to_binary(&lock_info)?);
     Ok(())
 }

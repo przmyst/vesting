@@ -1,5 +1,3 @@
-Below is the markup for the README section, including the explanations and code snippets you provided. This markup is written in Markdown, which is commonly used for README files on GitHub. Copy and paste this into your README.md file for it to display correctly on your GitHub repository.
-
 ```markdown
 ## Functionality
 
